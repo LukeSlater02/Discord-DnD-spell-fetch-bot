@@ -32,6 +32,7 @@ client.on("messageCreate", msg => {
       const exampleEmbed = new MessageEmbed()
       .setColor('#A7171A')
       .setTitle(`${foundSpell.name}
+      *${foundSpell.school} ${foundSpell.level}*
       `)
       .setThumbnail('https://thumbs.gfycat.com/EnlightenedTalkativeCapybara-max-1mb.gif')
       .addFields(
@@ -39,10 +40,8 @@ client.on("messageCreate", msg => {
         { name: 'Range', value: `${foundSpell.range.distance.amount ? foundSpell.range.distance.amount : ''} ${foundSpell.range.distance.type}`, inline: true },
         { name: 'Duration', value: `${foundSpell.duration[0].type === "instant" ? foundSpell.duration[0].type : foundSpell.duration[0].duration.amount + " " + foundSpell.duration[0].duration.type}`, inline: true },
         { name: 'Components', value: `${foundSpell.components.v ? "V" : ""} ${foundSpell.components.s ? "S" : ""} ${foundSpell.components.m ? foundSpell.components.m.text : ""}`, inline: true },
-        { name: '\u200B', value: '\u200B' },
       )
-      .setDescription(`*${foundSpell.school} ${foundSpell.level}*
-      ${foundSpell.entries.join("\n\n")}`)
+      .setFooter(`${foundSpell.entries.join("\n\n")}`)
       msg.reply(({ embeds: [exampleEmbed] }))
     }).catch(error => {
       msg.reply("Invalid spell name.")
