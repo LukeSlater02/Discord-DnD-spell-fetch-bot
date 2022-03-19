@@ -2,34 +2,48 @@ const config = require('./config.json');
 const discord = require('discord.js');
 const axios = require('axios')
 const { MessageEmbed } = require('discord.js');
+const { MessageActionRow, MessageButton } = require('discord.js');
 const client = new discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"]});
 
-const getSpell = (spellName) => {
-  return axios.get(`https://www.dnd5eapi.co/api/spells/${spellName}`)
+const getSpell = () => {
+  return axios.get(`http://localhost:8088/spell`)
 }
+
+// https://www.dnd5eapi.co/api/spells/${spellName}
 
 client.on("ready", () => {
   console.log("WITNESS ME")
 })
 
+// getSpell(`${msg.content.toLowerCase().split("!")[1]}`)
+
 client.on("messageCreate", msg => {
   if (msg.content.startsWith("!")){
-    getSpell(`${msg.content.toLowerCase().split("!")[1]}`).then(res => {
-  
-    const exampleEmbed = new MessageEmbed()
-	.setColor('#A7171A')
-	.setTitle(`${res.data.name}`)
-	.setDescription(`*${res.data.school.name} ${res.data.level}*`)
-	.setThumbnail('https://www.enworld.org/attachments/ampersand-on-black-png.112187/')
-	.addFields(
-		{ name: 'Casting Time', value: `${res.data.casting_time}`, inline: true },
-		{ name: 'Range', value: `${res.data.range}`, inline: true },
-    { name: 'Duration', value: `${res.data.duration}`, inline: true },
-    { name: 'Components', value: `${res.data.components.join(", ")}`, inline: true },
-    { name: '\u200B', value: '\u200B' },
-	)
-	.setDescription(`${res.data.desc.join("\n\n")}`)
-  msg.reply(({ embeds: [exampleEmbed] }))
+    
+    let foundSpell = []
+    getSpell().then(res => {
+      res.data.forEach(element => {
+        if (element.name.toLowerCase() === msg.content.split("!")[1].toLowerCase()){
+          foundSpell = element
+        }
+      })
+      console.log(foundSpell);
+    }).then(() => {
+      const exampleEmbed = new MessageEmbed()
+      .setColor('#A7171A')
+      .setTitle(`${foundSpell.name}
+      `)
+      .setThumbnail('https://thumbs.gfycat.com/EnlightenedTalkativeCapybara-max-1mb.gif')
+      .addFields(
+        { name: 'Casting Time', value: `${foundSpell.time[0].number} ${foundSpell.time[0].unit}`, inline: true },
+        { name: 'Range', value: `${foundSpell.range.distance.amount ? foundSpell.range.distance.amount : ''} ${foundSpell.range.distance.type}`, inline: true },
+        { name: 'Duration', value: `${foundSpell.duration[0].type === "instant" ? foundSpell.duration[0].type : foundSpell.duration[0].duration.amount + " " + foundSpell.duration[0].duration.type}`, inline: true },
+        { name: 'Components', value: `${foundSpell.components.v ? "V" : ""} ${foundSpell.components.s ? "S" : ""} ${foundSpell.components.m ? foundSpell.components.m.text : ""}`, inline: true },
+        { name: '\u200B', value: '\u200B' },
+      )
+      .setDescription(`*${foundSpell.school} ${foundSpell.level}*
+      ${foundSpell.entries.join("\n\n")}`)
+      msg.reply(({ embeds: [exampleEmbed] }))
     }).catch(error => {
       msg.reply("Invalid spell name.")
     })
@@ -37,3 +51,10 @@ client.on("messageCreate", msg => {
 })
 
 client.login(config.token)
+
+
+
+let componentList = []
+
+
+
