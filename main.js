@@ -55,16 +55,24 @@ client.on("messageCreate", msg => {
           { name: 'Duration', value: `${foundSpell.duration[0].type === "instant" ? foundSpell.duration[0].type : foundSpell.duration[0].duration.amount + " " + foundSpell.duration[0].duration.type} ${foundSpell.duration[0].concentration ? "(concentration)" : ""}`, inline: true },
           { name: 'Components', value: `${foundSpell.components.v ? "V" : ""} ${foundSpell.components.s ? "S" : ""} ${checkForM(foundSpell)}`, inline: true },
         )
-        .setFooter(`${foundSpell.entries.join("\n\n")}`)
+        .setFooter(`${foundSpell.entries.map((entry) => {
+          if(entry.type === 'list') {
+            return entry.items.map((listItem) => {
+              return `- ${listItem} \n`;
+            })
+          } else {
+            return entry;
+          }
+        })}`)
       msg.reply(({ embeds: [exampleEmbed] }))
-    }).catch(error => {
-      msg.reply("Invalid spell name.")
     })
   }
 })
 
 client.login(config.token)
-
+// .catch(error => {
+//   msg.reply("Invalid spell name.")
+// })
 
 
 
