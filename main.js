@@ -1,4 +1,4 @@
-const config = require('./config.json');
+const config = require('./config');
 const discord = require('discord.js');
 const axios = require('axios')
 const { MessageEmbed } = require('discord.js');
