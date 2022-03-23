@@ -27,12 +27,12 @@ client.on("messageCreate", msg => {
     }
   }
 
-  if (msg.content.startsWith("!")) {
+  if (msg.content.startsWith("!dnd ")) {
 
     let foundSpell = []
     getSpell().then(res => {
       res.data.forEach(element => {
-        if (element.name.toLowerCase() === msg.content.split("!")[1].toLowerCase()) {
+        if (element.name.toLowerCase() === msg.content.split("!dnd ")[1].toLowerCase()) {
           foundSpell = element
         }
       })
@@ -65,9 +65,7 @@ client.on("messageCreate", msg => {
         )
         .setDescription(showEntries)
       msg.reply(({ embeds: [exampleEmbed] }))
-    }).catch(error => {
-  msg.reply("Invalid spell name.")
-})
+    })
   }
 })
 
@@ -75,3 +73,6 @@ client.login(config.token)
 
 
 
+// .catch(error => {
+//   msg.reply("Invalid spell name.")
+// })
