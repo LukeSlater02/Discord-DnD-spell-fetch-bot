@@ -9,13 +9,9 @@ const getSpell = () => {
   return axios.get(`http://localhost:8088/spell`)
 }
 
-// https://www.dnd5eapi.co/api/spells/${spellName}
-
 client.on("ready", () => {
   console.log("WITNESS ME")
 })
-
-// getSpell(`${msg.content.toLowerCase().split("!")[1]}`)
 
 client.on("messageCreate", msg => {
 
@@ -30,6 +26,7 @@ client.on("messageCreate", msg => {
       return ''
     }
   }
+
   if (msg.content.startsWith("!")) {
 
     let foundSpell = []
@@ -43,7 +40,18 @@ client.on("messageCreate", msg => {
       console.log(foundSpell);
 
     }).then(() => {
-      const { components: { m = 'defaultValue' } } = foundSpell
+      let showEntries = `${foundSpell.entries.reduce((accum, curVal) => {
+        if (curVal.items){
+          return accum += `\n \n-${curVal.items.join("\n \n-")}\n`
+        } else if (curVal.entries){
+          return accum += `\n \n-${curVal.entries.join("\n \n-")}\n`
+        } else if (curVal.type === 'table'){
+          return accum += `\n \n a goddamn table you roll on? you fuckin kiddin me im not coding that shit for free \n`
+        } else {
+          return accum += `\n\n${curVal}`
+        }
+      })}`
+
       const exampleEmbed = new MessageEmbed()
         .setColor('#A7171A')
         .setTitle(`${foundSpell.name}\n*${foundSpell.school} ${foundSpell.level}* ${foundSpell.meta ? "(ritual)" : ''}
@@ -55,24 +63,15 @@ client.on("messageCreate", msg => {
           { name: 'Duration', value: `${foundSpell.duration[0].type === "instant" ? foundSpell.duration[0].type : foundSpell.duration[0].duration.amount + " " + foundSpell.duration[0].duration.type} ${foundSpell.duration[0].concentration ? "(concentration)" : ""}`, inline: true },
           { name: 'Components', value: `${foundSpell.components.v ? "V" : ""} ${foundSpell.components.s ? "S" : ""} ${checkForM(foundSpell)}`, inline: true },
         )
-        .setFooter(`${foundSpell.entries.map((entry) => {
-          if(entry.type === 'list') {
-            return entry.items.map((listItem) => {
-              return `- ${listItem} \n`;
-            })
-          } else {
-            return entry;
-          }
-        })}`)
+        .setDescription(showEntries)
       msg.reply(({ embeds: [exampleEmbed] }))
-    })
+    }).catch(error => {
+  msg.reply("Invalid spell name.")
+})
   }
 })
 
 client.login(config.token)
-// .catch(error => {
-//   msg.reply("Invalid spell name.")
-// })
 
 
 
