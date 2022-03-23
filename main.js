@@ -1,9 +1,7 @@
 const data = require('./api/spells');
 const config = require('./config');
 const discord = require('discord.js');
-const axios = require('axios')
 const { MessageEmbed } = require('discord.js');
-const { MessageActionRow, MessageButton } = require('discord.js');
 const client = new discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
 
 client.on("ready", () => {
@@ -60,7 +58,3 @@ client.on("messageCreate", msg => {
 })
 
 client.login(config.token)
-
-  .catch(error => {
-    msg.reply("Invalid spell name.")
-  })
