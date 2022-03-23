@@ -1,13 +1,8 @@
+const data = require('./api/spells');
 const config = require('./config');
 const discord = require('discord.js');
-const axios = require('axios')
 const { MessageEmbed } = require('discord.js');
-const { MessageActionRow, MessageButton } = require('discord.js');
 const client = new discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
-
-const getSpell = () => {
-  return axios.get(`http://localhost:8088/spell`)
-}
 
 client.on("ready", () => {
   console.log("WITNESS ME")
@@ -28,24 +23,22 @@ client.on("messageCreate", msg => {
   }
 
   if (msg.content.startsWith("!dnd ")) {
+    let foundSpell;
+    data.spellData.forEach(element => {
+      if (element.name.toLowerCase() === msg.content.split("!dnd ")[1].toLowerCase()) {
+        foundSpell = element;
+      }
+    })
 
-    let foundSpell = []
-    getSpell().then(res => {
-      res.data.forEach(element => {
-        if (element.name.toLowerCase() === msg.content.split("!dnd ")[1].toLowerCase()) {
-          foundSpell = element
-        }
-      })
-
-      console.log(foundSpell);
-
-    }).then(() => {
+    if (!foundSpell) {
+      msg.reply("Invalid spell name.");
+    } else {
       let showEntries = `${foundSpell.entries.reduce((accum, curVal) => {
-        if (curVal.items){
+        if (curVal.items) {
           return accum += `\n \n-${curVal.items.join("\n \n-")}\n`
-        } else if (curVal.entries){
+        } else if (curVal.entries) {
           return accum += `\n \n-${curVal.entries.join("\n \n-")}\n`
-        } else if (curVal.type === 'table'){
+        } else if (curVal.type === 'table') {
           return accum += `\n \n a goddamn table you roll on? you fuckin kiddin me im not coding that shit for free \n`
         } else {
           return accum += `\n\n${curVal}`
@@ -65,13 +58,8 @@ client.on("messageCreate", msg => {
         )
         .setDescription(showEntries)
       msg.reply(({ embeds: [exampleEmbed] }))
-    }).catch(err => {
-      msg.reply("Invalid spell name.")
-    })
+    }
   }
 })
 
 client.login(config.token)
-
-
-
