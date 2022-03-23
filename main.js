@@ -65,7 +65,7 @@ client.on("messageCreate", msg => {
         )
         .setDescription(showEntries)
       msg.reply(({ embeds: [exampleEmbed] }))
-    }).catch(error => {
+    }).catch(err => {
       msg.reply("Invalid spell name.")
     })
   }
